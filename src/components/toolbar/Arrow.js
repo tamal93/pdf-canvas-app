@@ -1,17 +1,17 @@
 import React from "react";
 
-const Line = () => {
+const Arrow = () => {
   return (
     <div>
       <button
         onClick={e => {
-          this.setState({ newDrawableType: "LineDrawable" });
+          this.setState({ newDrawableType: "ArrowDrawable" });
         }}
       >
-        Line
+        Arrow
       </button>
     </div>
   );
 };
 
-export default Line;
+export default Arrow;

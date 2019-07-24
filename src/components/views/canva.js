@@ -1,77 +1,90 @@
 import React, { Component } from "react";
+import { Stage, Layer } from "react-konva";
 import { Document, Page, pdfjs } from "react-pdf";
-// import { Document, Page, pdfjs, View, styles } from "react-pdf";
-import { Stage, Layer, Line } from "react-konva";
-// import { Stage, Layer, Line, Text, Rect, Circle, Ellipse } from "react-konva";
+//import ReactDOM from "react-dom";
+import {
+  // LineDrawable,
+  ArrowDrawable,
+  CircleDrawable,
+  FreePathDrawable
+} from "./canvasDrawables";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${
   pdfjs.version
 }/pdf.worker.js`;
 
-export default class Canva extends Component {
-  state = {
-    lines: [],
-    x1: "",
-    y1: "",
-    x2: "",
-    y2: ""
+class Canva extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      drawables: [],
+      newDrawable: [],
+      newDrawableType: "CircleDrawable"
+    };
+  }
+
+  getNewDrawableBasedOnType = (x, y, type) => {
+    const drawableClasses = {
+      FreePathDrawable,
+      ArrowDrawable,
+      CircleDrawable
+    };
+
+    return new drawableClasses[type](x, y);
   };
 
-  handleMouseDown = () => {
-    this._drawing = true;
-    this.setState({
-      lines: [...this.state.lines, []]
-    });
+  handleMouseDown = e => {
+    const { newDrawable } = this.state;
+    if (newDrawable.length === 0) {
+      const { x, y } = e.target.getStage().getPointerPosition();
+      const newDrawable = this.getNewDrawableBasedOnType(
+        x,
+        y,
+        this.state.newDrawableType
+      );
+      this.setState({
+        newDrawable: [newDrawable]
+      });
+    }
   };
 
-  handleMouseUp = () => {
-    this._drawing = false;
+  handleMouseUp = e => {
+    const { newDrawable, drawables } = this.state;
+    if (newDrawable.length === 1) {
+      const { x, y } = e.target.getStage().getPointerPosition();
+      const drawableToAdd = newDrawable[0];
+      drawableToAdd.registerMovement(x, y);
+      drawables.push(drawableToAdd);
+      this.setState({
+        newDrawable: [],
+        drawables
+      });
+    }
   };
 
   handleMouseMove = e => {
-    if (!this._drawing) {
-      return;
+    const { newDrawable } = this.state;
+    if (newDrawable.length === 1) {
+      const { x, y } = e.target.getStage().getPointerPosition();
+      const updatedNewDrawable = newDrawable[0];
+      updatedNewDrawable.registerMovement(x, y);
+      this.setState({
+        newDrawable: [updatedNewDrawable]
+      });
     }
-    const stage = this.stageRef.getStage();
-    const point = stage.getPointerPosition();
-    const { lines } = this.state;
-    let lastLine = lines[lines.length - 1];
-    lastLine = lastLine.concat([point.x, point.y]);
-    lines.splice(lines.length - 1, 1, lastLine);
-    this.setState({
-      lines: lines.concat()
-    });
-  };
-
-  handleClick = () => {
-    const numbers = this.state.lines[0];
-
-    const doubled = numbers.map(number => number);
-
-    for (var i = 1; i < doubled.length; i += 2) {
-      doubled[i] = 842 - doubled[i];
-    }
-
-    // const reqObj = {
-    //   points: doubled
-    // };
-  };
-
-  myFunction = (value, index, array) => {
-    return value;
   };
 
   render() {
+    const drawables = [...this.state.drawables, ...this.state.newDrawable];
     return (
       <div>
-        <button className="btnStyle" onClick={this.handleClick}>
-          Download pdf{" "}
-        </button>
-
         <div
           style={{
+            width: window.innerWidth / 2,
+            height: 900,
             // top: 100,
             left: 10,
+            zIndex: 1,
             position: "absolute",
             border: "1px solid black"
           }}
@@ -80,32 +93,33 @@ export default class Canva extends Component {
             file="./myreport.pdf"
             onLoadSuccess={this.onDocumentLoadSuccess}
           >
-            <Page pageNumber={1} width={window.innerWidth / 2} height={842} />
+            <Page pageNumber={1} width={window.innerWidth / 2} height={900} />
           </Document>
         </div>
-
         <div
           style={{
-            // top: 100,
+            width: window.innerWidth / 2,
+            height: 900,
+            //top: 100,
             left: 10,
-            position: "absolute"
+            zIndex: 100,
+            position: "absolute",
+
+            border: "1px solid black"
           }}
         >
           <Stage
-            className="myStage"
-            onContentMousemove={this.handleMouseMove}
-            onContentMousedown={this.handleMouseDown}
-            onContentMouseup={this.handleMouseUp}
+            onMouseDown={this.handleMouseDown}
+            onMouseUp={this.handleMouseUp}
+            onMouseMove={this.handleMouseMove}
             width={window.innerWidth / 2}
-            height={842}
-            ref={node => {
-              this.stageRef = node;
-            }}
+            height={900}
+            style={{ background: "transparent" }}
           >
             <Layer>
-              {this.state.lines.map((line, i) => (
-                <Line key={i} points={line} stroke="black" strokeWidth="1.2" />
-              ))}
+              {drawables.map(drawable => {
+                return drawable.render();
+              })}
             </Layer>
           </Stage>
         </div>
@@ -113,3 +127,5 @@ export default class Canva extends Component {
     );
   }
 }
+
+export default Canva;
