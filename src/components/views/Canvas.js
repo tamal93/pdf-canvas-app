@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { Stage, Layer } from "react-konva";
 import { Document, Page, pdfjs } from "react-pdf";
-//import ReactDOM from "react-dom";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+
 import {
   // LineDrawable,
   ArrowDrawable,
@@ -13,16 +15,23 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
   pdfjs.version
 }/pdf.worker.js`;
 
-class Canva extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      drawables: [],
-      newDrawable: [],
-      newDrawableType: "CircleDrawable"
-    };
-  }
+class Canvas extends Component {
+  state = {
+    drawables: [],
+    newDrawable: [],
+    newDrawableType: "ArrowDrawable"
+  };
 
+  static propTypes = {
+    drawableType: PropTypes.string.isRequired
+  };
+  componentWillReceiveProps(nextProps) {
+    if (nextProps !== this.state) {
+      this.setState({
+        newDrawableType: nextProps.drawableType
+      });
+    }
+  }
   getNewDrawableBasedOnType = (x, y, type) => {
     const drawableClasses = {
       FreePathDrawable,
@@ -76,30 +85,36 @@ class Canva extends Component {
 
   render() {
     const drawables = [...this.state.drawables, ...this.state.newDrawable];
+
     return (
       <div>
         <div
           style={{
-            width: window.innerWidth / 2,
-            height: 900,
+            width: "100%",
+            height: 1200,
             // top: 100,
+
             left: 10,
             zIndex: 1,
             position: "absolute",
-            border: "1px solid black"
+            border: "1px solid #5A6268"
           }}
         >
           <Document
             file="./myreport.pdf"
             onLoadSuccess={this.onDocumentLoadSuccess}
           >
-            <Page pageNumber={1} width={window.innerWidth / 2} height={900} />
+            <Page
+              pageNumber={1}
+              width={window.innerWidth / 1.62}
+              height={900}
+            />
           </Document>
         </div>
         <div
           style={{
-            width: window.innerWidth / 2,
-            height: 900,
+            width: "100%",
+            height: 1200,
             //top: 100,
             left: 10,
             zIndex: 100,
@@ -112,8 +127,8 @@ class Canva extends Component {
             onMouseDown={this.handleMouseDown}
             onMouseUp={this.handleMouseUp}
             onMouseMove={this.handleMouseMove}
-            width={window.innerWidth / 2}
-            height={900}
+            width={window.innerWidth / 1.62}
+            height={1200}
             style={{ background: "transparent" }}
           >
             <Layer>
@@ -128,4 +143,13 @@ class Canva extends Component {
   }
 }
 
-export default Canva;
+const mapStateToProps = state => {
+  return {
+    drawableType: state.toolbarData.drawType
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  {}
+)(Canvas);
