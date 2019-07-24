@@ -9,7 +9,7 @@ const App = () => {
           <ToolBar />
         </div>
         <div className="col-md-6">
-          <Canva />y
+          <Canva />
         </div>
       </div>
     </div>

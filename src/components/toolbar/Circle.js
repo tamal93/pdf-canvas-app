@@ -1,7 +1,17 @@
 import React from "react";
 
 const Circle = () => {
-  return <div>circle</div>;
+  return (
+    <div>
+      <button
+        onClick={e => {
+          this.setState({ newDrawableType: "CircleDrawable" });
+        }}
+      >
+        Circles
+      </button>
+    </div>
+  );
 };
 
 export default Circle;

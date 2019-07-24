@@ -1,17 +1,17 @@
 import React from "react";
 
-const Line = () => {
+const Rectangle = () => {
   return (
     <div>
       <button
         onClick={e => {
-          this.setState({ newDrawableType: "LineDrawable" });
+          this.setState({ newDrawableType: "RectangleDrawable" });
         }}
       >
-        Line
+        Rectangle
       </button>
     </div>
   );
 };
 
-export default Line;
+export default Rectangle;
