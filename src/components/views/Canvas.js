@@ -3,6 +3,7 @@ import { Stage, Layer } from "react-konva";
 import { Document, Page, pdfjs } from "react-pdf";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { getCanvasData, updateCanvasData } from "../../actions/canvasActions";
 
 import {
   ArrowDrawable,
@@ -18,33 +19,50 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 class Canvas extends Component {
   state = {
+    user: {},
+    canvasId: null,
     drawables: [],
     newDrawable: [],
     newDrawableType: "ArrowDrawable"
   };
 
   componentDidMount() {
-    this.getCanvasData();
+    this.getUserData();
   }
-  getCanvasData = () => {
-    this.setState({
-      drawables: this.props.drawables,
-      newDrawable: this.props.newDrawable
-    });
+  componentWillReceiveProps(nextProps) {
+    if (nextProps !== this.props) {
+      console.log(nextProps.drawables);
+
+      let newDrawables = this.convertDataToDrawables(nextProps.drawables);
+      this.setState({
+        drawables: newDrawables,
+        newDrawableType: nextProps.drawableType,
+        canvasId: nextProps.canvasId
+      });
+    }
+  }
+  getUserData = () => {
+    setTimeout(
+      function() {
+        this.setState({ user: { user_id: 1 } }, () => {
+          this.getCanvasData(this.state.user.user_id);
+        });
+      }.bind(this),
+      1000
+    );
+  };
+  getCanvasData = id => {
+    this.props.getCanvasData(id);
   };
 
   static propTypes = {
     drawableType: PropTypes.string.isRequired,
     drawables: PropTypes.array.isRequired,
-    newDrawable: PropTypes.array.isRequired
+    getCanvasData: PropTypes.func.isRequired,
+    updateCanvasData: PropTypes.func.isRequired,
+    canvasId: PropTypes.number
   };
-  componentWillReceiveProps(nextProps) {
-    if (nextProps !== this.state) {
-      this.setState({
-        newDrawableType: nextProps.drawableType
-      });
-    }
-  }
+
   getNewDrawableBasedOnType = (x, y, type) => {
     const drawableClasses = {
       FreePathDrawable,
@@ -72,17 +90,79 @@ class Canvas extends Component {
     }
   };
 
+  convertDatatoJson = data => {
+    let updateddata = data.map(item => {
+      if (item.constructor === ArrowDrawable) {
+        return {
+          className: "ArrowDrawable",
+          attrs: item
+        };
+      }
+      if (item.constructor === CircleDrawable) {
+        return {
+          className: "CircleDrawable",
+          attrs: item
+        };
+      }
+      if (item.constructor === FreePathDrawable) {
+        return {
+          className: "FreePathDrawable",
+          attrs: item
+        };
+      }
+      if (item.constructor === LineDrawable) {
+        return {
+          className: "LineDrawable",
+          attrs: item
+        };
+      }
+      if (item.constructor === RectangleDrawable) {
+        return {
+          className: "RectangleDrawable",
+          attrs: item
+        };
+      }
+      return null;
+    });
+    return { drawables: updateddata };
+  };
+
+  convertDataToDrawables = data => {
+    if (data.length > 0) {
+      const drawables = data.map(item => {
+        const newaDrawable = this.getNewDrawableBasedOnType(
+          item.attrs.startx,
+          item.attrs.starty,
+          item.className
+        );
+        newaDrawable.registerMovement(item.attrs.x, item.attrs.y);
+        return newaDrawable;
+      });
+
+      return drawables;
+    }
+    return [];
+  };
+
   handleMouseUp = e => {
-    const { newDrawable, drawables } = this.state;
+    const { newDrawable, drawables, canvasId } = this.state;
     if (newDrawable.length === 1) {
       const { x, y } = e.target.getStage().getPointerPosition();
       const drawableToAdd = newDrawable[0];
       drawableToAdd.registerMovement(x, y);
       drawables.push(drawableToAdd);
-      this.setState({
-        newDrawable: [],
-        drawables
-      });
+
+      this.setState(
+        {
+          newDrawable: [],
+          drawables
+        },
+        () => {
+          const drawableJsons = this.convertDatatoJson(this.state.drawables);
+
+          this.props.updateCanvasData(canvasId, JSON.stringify(drawableJsons));
+        }
+      );
     }
   };
 
@@ -164,11 +244,11 @@ const mapStateToProps = state => {
   return {
     drawableType: state.toolbarData.drawType,
     drawables: state.canvasData.drawables,
-    newDrawable: state.canvasData.newDrawable
+    canvasId: state.canvasData.canvas_id
   };
 };
 
 export default connect(
   mapStateToProps,
-  {}
+  { getCanvasData, updateCanvasData }
 )(Canvas);

@@ -7,7 +7,7 @@ import {
 } from "../actions/types";
 
 const initialState = {
-  drawType: ""
+  drawType: "ArrowDrawable"
 };
 
 export default function(state = initialState, action) {
