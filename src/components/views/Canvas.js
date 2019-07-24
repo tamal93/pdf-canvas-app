@@ -5,10 +5,11 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import {
-  // LineDrawable,
   ArrowDrawable,
   CircleDrawable,
-  FreePathDrawable
+  FreePathDrawable,
+  LineDrawable,
+  RectangleDrawable
 } from "./canvasDrawables";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${
@@ -22,8 +23,20 @@ class Canvas extends Component {
     newDrawableType: "ArrowDrawable"
   };
 
+  componentDidMount() {
+    this.getCanvasData();
+  }
+  getCanvasData = () => {
+    this.setState({
+      drawables: this.props.drawables,
+      newDrawable: this.props.newDrawable
+    });
+  };
+
   static propTypes = {
-    drawableType: PropTypes.string.isRequired
+    drawableType: PropTypes.string.isRequired,
+    drawables: PropTypes.array.isRequired,
+    newDrawable: PropTypes.array.isRequired
   };
   componentWillReceiveProps(nextProps) {
     if (nextProps !== this.state) {
@@ -36,7 +49,9 @@ class Canvas extends Component {
     const drawableClasses = {
       FreePathDrawable,
       ArrowDrawable,
-      CircleDrawable
+      CircleDrawable,
+      LineDrawable,
+      RectangleDrawable
     };
 
     return new drawableClasses[type](x, y);
@@ -108,9 +123,9 @@ class Canvas extends Component {
               pageNumber={1}
               width={window.innerWidth / 1.62}
               height={900}
-            />
-          </Document>
-        </div>
+            />{" "}
+          </Document>{" "}
+        </div>{" "}
         <div
           style={{
             width: "100%",
@@ -129,7 +144,9 @@ class Canvas extends Component {
             onMouseMove={this.handleMouseMove}
             width={window.innerWidth / 1.62}
             height={1200}
-            style={{ background: "transparent" }}
+            style={{
+              background: "transparent"
+            }}
           >
             <Layer>
               {drawables.map(drawable => {
@@ -145,7 +162,9 @@ class Canvas extends Component {
 
 const mapStateToProps = state => {
   return {
-    drawableType: state.toolbarData.drawType
+    drawableType: state.toolbarData.drawType,
+    drawables: state.canvasData.drawables,
+    newDrawable: state.canvasData.newDrawable
   };
 };
 

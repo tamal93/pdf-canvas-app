@@ -3,3 +3,5 @@ export const DRAW_FREEPATH = "DRAW_FREEPATH";
 export const DRAW_RECTANGLE = "DRAW_RECTANGLE";
 export const DRAW_ARROW = "DRAW_ARROW";
 export const DRAW_CIRCLE = "DRAW_CIRCLE";
+export const GET_CANVAS_DATA = "GET_CANVAS_DATA";
+export const UPDATE_CANVAS_DATA = "UPDATE_CANVAS_DATA";
