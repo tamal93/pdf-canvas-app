@@ -1,17 +1,38 @@
 import React from "react";
+import { connect } from "react-redux";
+import { drawFreePathType } from "../../actions/toolbarActions";
+import PropTypes from "prop-types";
 
-const FreeHand = () => {
+function FreePath(props) {
+  const Draw = event => {
+    props.drawFreePathType();
+  };
   return (
     <div>
       <button
-        onClick={e => {
-          this.setState({ newDrawableType: "FreeDrawable" });
+        className="btn btn-block btn-secondary  my-1"
+        onClick={event => {
+          Draw(event);
         }}
       >
-        FreeHandDraw
+        Free Path
       </button>
     </div>
   );
+}
+
+FreePath.propTypes = {
+  drawableType: PropTypes.string,
+  drawFreePathType: PropTypes.func.isRequired
 };
 
-export default FreeHand;
+const mapStateToProps = state => {
+  return {
+    drawableType: state.toolbarData.drawType
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { drawFreePathType }
+)(FreePath);
