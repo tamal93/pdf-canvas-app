@@ -5,6 +5,7 @@ import Line from "../toolbar/Line";
 import Circle from "../toolbar/Circle";
 import FreePath from "../toolbar/FreeHand";
 import Rectangle from "../toolbar/Rectangle";
+import ClearData from "../toolbar/ClearData";
 
 class ToolBar extends Component {
   render() {
@@ -15,6 +16,7 @@ class ToolBar extends Component {
         <Arrow />
         <Circle />
         <Rectangle />
+        <ClearData />
       </div>
     );
   }

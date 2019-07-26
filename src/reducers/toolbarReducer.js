@@ -3,11 +3,13 @@ import {
   DRAW_FREEPATH,
   DRAW_RECTANGLE,
   DRAW_ARROW,
-  DRAW_CIRCLE
+  DRAW_CIRCLE,
+  CLEAR_CANVAS_CLICK
 } from "../actions/types";
 
 const initialState = {
-  drawType: "ArrowDrawable"
+  drawType: "LineDrawable",
+  clearData: false
 };
 
 export default function(state = initialState, action) {
@@ -36,6 +38,11 @@ export default function(state = initialState, action) {
       return {
         ...state,
         drawType: action.payload
+      };
+    case CLEAR_CANVAS_CLICK:
+      return {
+        ...state,
+        clearData: action.payload
       };
     default:
       return state;

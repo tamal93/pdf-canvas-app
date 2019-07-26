@@ -3,7 +3,12 @@ import { Stage, Layer } from "react-konva";
 import { Document, Page, pdfjs } from "react-pdf";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getCanvasData, updateCanvasData } from "../../actions/canvasActions";
+import {
+  getCanvasData,
+  updateCanvasData,
+  clearCanvasData
+} from "../../actions/canvasActions";
+import { triggerCanvasDataClear } from "../../actions/toolbarActions";
 
 import {
   ArrowDrawable,
@@ -23,7 +28,7 @@ class Canvas extends Component {
     canvasId: null,
     drawables: [],
     newDrawable: [],
-    newDrawableType: "ArrowDrawable"
+    newDrawableType: ""
   };
 
   componentDidMount() {
@@ -31,9 +36,14 @@ class Canvas extends Component {
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps !== this.props) {
-      console.log(nextProps.drawables);
-
       let newDrawables = this.convertDataToDrawables(nextProps.drawables);
+      if (nextProps.clearCanvas) {
+        this.props.clearCanvasData(
+          this.state.canvasId,
+          JSON.stringify({ drawables: [] })
+        );
+        this.props.triggerCanvasDataClear(false);
+      }
       this.setState({
         drawables: newDrawables,
         newDrawableType: nextProps.drawableType,
@@ -60,6 +70,8 @@ class Canvas extends Component {
     drawables: PropTypes.array.isRequired,
     getCanvasData: PropTypes.func.isRequired,
     updateCanvasData: PropTypes.func.isRequired,
+    triggerCanvasDataClear: PropTypes.func,
+    clearData: PropTypes.bool,
     canvasId: PropTypes.number
   };
 
@@ -244,11 +256,12 @@ const mapStateToProps = state => {
   return {
     drawableType: state.toolbarData.drawType,
     drawables: state.canvasData.drawables,
-    canvasId: state.canvasData.canvas_id
+    canvasId: state.canvasData.canvas_id,
+    clearCanvas: state.toolbarData.clearData
   };
 };
 
 export default connect(
   mapStateToProps,
-  { getCanvasData, updateCanvasData }
+  { getCanvasData, updateCanvasData, clearCanvasData, triggerCanvasDataClear }
 )(Canvas);

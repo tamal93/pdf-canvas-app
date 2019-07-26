@@ -1,4 +1,8 @@
-import { GET_CANVAS_DATA, UPDATE_CANVAS_DATA } from "../actions/types";
+import {
+  GET_CANVAS_DATA,
+  UPDATE_CANVAS_DATA,
+  CLEAR_CANVAS_DATA
+} from "../actions/types";
 
 const initialState = {
   canvas_id: null,
@@ -16,7 +20,11 @@ export default function(state = initialState, action) {
     case UPDATE_CANVAS_DATA:
       return {
         ...state,
-        canvas_id: action.payload.id,
+        drawables: action.payload.drawables
+      };
+    case CLEAR_CANVAS_DATA:
+      return {
+        ...state,
         drawables: action.payload.drawables
       };
     default:

@@ -3,7 +3,8 @@ import {
   DRAW_FREEPATH,
   DRAW_RECTANGLE,
   DRAW_ARROW,
-  DRAW_CIRCLE
+  DRAW_CIRCLE,
+  CLEAR_CANVAS_CLICK
 } from "../actions/types";
 
 export const drawLineType = () => {
@@ -34,5 +35,11 @@ export const drawCircleType = () => {
   return {
     type: DRAW_CIRCLE,
     payload: "CircleDrawable"
+  };
+};
+export const triggerCanvasDataClear = flag => {
+  return {
+    type: CLEAR_CANVAS_CLICK,
+    payload: flag
   };
 };

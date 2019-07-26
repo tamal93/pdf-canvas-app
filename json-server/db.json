@@ -13,35 +13,7 @@
       "id": 1,
       "user_id": 1,
       "canvas_name": "MY CANVAS",
-      "drawables": [
-        {
-          "className": "CircleDrawable",
-          "attrs": {
-            "startx": 129,
-            "starty": 167,
-            "x": 387,
-            "y": 266
-          }
-        },
-        {
-          "className": "ArrowDrawable",
-          "attrs": {
-            "startx": 332,
-            "starty": 657,
-            "x": 390,
-            "y": 474
-          }
-        },
-        {
-          "className": "LineDrawable",
-          "attrs": {
-            "startx": 199,
-            "starty": 331,
-            "x": 438,
-            "y": 432
-          }
-        }
-      ]
+      "drawables": []
     }
   ]
 }
